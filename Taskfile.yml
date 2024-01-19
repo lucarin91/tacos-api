@@ -1,0 +1,40 @@
+version: "3"
+
+tasks:
+  init:
+    desc: Setup local env
+    deps: [install:linter, install:goimports]
+
+  test:
+    desc: Run all tests
+    cmds:
+      - go test ./... -v
+
+  lint:
+    desc: Run the linters
+    cmds:
+      - golangci-lint run -v --timeout 300s
+
+  fmt:
+    desc: Run Go format
+    cmds:
+      - goimports -l -w .
+
+  install:linter:
+    cmds:
+      - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.54.2
+
+  install:goimports:
+    cmds:
+      - go install golang.org/x/tools/cmd/goimports@v0.10
+
+  db:run:
+    desc: Run local database
+    cmds:
+      - docker rm -f postgres || true
+      - docker run --name postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -v $(pwd)/sql:/docker-entrypoint-initdb.d -d postgres:13.3
+
+  db:connect:
+    desc: Connect to local database
+    cmds:
+      - psql -h localhost -U postgres -d postgres

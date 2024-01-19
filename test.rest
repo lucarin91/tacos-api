@@ -1,0 +1,39 @@
+GET http://127.0.0.1:8080/v1/orders/
+
+###
+
+GET http://127.0.0.1:8080/v1/orders/123e4567-e89b-12d3-a456-426614174000
+
+###
+
+POST  http://127.0.0.1:8080/v1/orders/ HTTP/1.1
+content-type: application/json
+
+{
+    "ingredients": [
+        {
+            "id": "123e4567-e89b-12d3-a456-426614174001",
+            "name": "tomato",
+            "category": "vegetable"
+        },
+        {
+            "id": "123e4567-e89b-12d3-a456-426614174004",
+            "name": "ham",
+            "category": "protein"
+        },
+        {
+            "id": "123e4567-e89b-12d3-a456-426614174005",
+            "name": "pita",
+            "category": "bread"
+        }
+    ]
+}
+
+
+###
+
+DELETE  http://127.0.0.1:8080/v1/orders/123e4567-e89b-12d3-a456-426614174000
+
+###
+
+GET http://127.0.0.1:8080/v1/ingredients/
