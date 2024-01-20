@@ -14,3 +14,7 @@ type Ingredient struct {
 	Name     string    `json:"name"`
 	Category string    `json:"category"`
 }
+
+type Token struct {
+	Token string `json:"token"`
+}

@@ -4,6 +4,7 @@ go 1.21.0
 
 require (
 	github.com/dimfeld/httptreemux/v5 v5.5.0
+	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/jackc/pgx/v5 v5.5.2
 )
 

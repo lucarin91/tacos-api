@@ -1,12 +1,23 @@
+GET http://127.0.0.1:8080/v1/ingredients/
+
+###
+
+GET http://127.0.0.1:8080/v1/token/?username=admin&password=admin
+
+###
+
 GET http://127.0.0.1:8080/v1/orders/
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDU3MTg2MTMsInVzZXJfaWQiOiI2YmE3YjgxNC05ZGFkLTExZDEtODBiNC0wMGMwNGZkNDMwYzkifQ.Pj1mk184oou49TEe1U2aywTK6BapYu14FNtzsrXOUlg
 
 ###
 
 GET http://127.0.0.1:8080/v1/orders/123e4567-e89b-12d3-a456-426614174000
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDU3MTg2MTMsInVzZXJfaWQiOiI2YmE3YjgxNC05ZGFkLTExZDEtODBiNC0wMGMwNGZkNDMwYzkifQ.Pj1mk184oou49TEe1U2aywTK6BapYu14FNtzsrXOUlg
 
 ###
 
 POST  http://127.0.0.1:8080/v1/orders/ HTTP/1.1
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDU3MTg2MTMsInVzZXJfaWQiOiI2YmE3YjgxNC05ZGFkLTExZDEtODBiNC0wMGMwNGZkNDMwYzkifQ.Pj1mk184oou49TEe1U2aywTK6BapYu14FNtzsrXOUlg
 content-type: application/json
 
 {
@@ -33,7 +44,5 @@ content-type: application/json
 ###
 
 DELETE  http://127.0.0.1:8080/v1/orders/123e4567-e89b-12d3-a456-426614174000
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDU3MTg2MTMsInVzZXJfaWQiOiI2YmE3YjgxNC05ZGFkLTExZDEtODBiNC0wMGMwNGZkNDMwYzkifQ.Pj1mk184oou49TEe1U2aywTK6BapYu14FNtzsrXOUlg
 
-###
-
-GET http://127.0.0.1:8080/v1/ingredients/

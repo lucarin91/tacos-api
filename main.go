@@ -20,12 +20,14 @@ type Config struct {
 	LogLevel slog.Level
 	Port     int
 	DbUrl    string
+	secret   []byte
 }
 
 var cfg = Config{
 	LogLevel: slog.LevelDebug,
 	Port:     8080,
 	DbUrl:    "postgres://postgres:postgres@localhost:5432",
+	secret:   []byte("very secret key"),
 }
 
 func main() {
@@ -71,12 +73,16 @@ func AddHandlers(router *httptreemux.TreeMux, pool *pgxpool.Pool) *httptreemux.T
 	router.Use(middlewares.Log)
 
 	api := router.NewGroup("/v1")
+
+	api.GET("/token", handlers.GetToken(cfg.secret))
+
 	api.GET("/ingredients", handlers.GetIngredients(pool))
 
-	api.GET("/orders", middlewares.Auth(handlers.GetOrders(pool)))
-	api.GET("/orders/:id", middlewares.Auth(handlers.GetOrder(pool)))
-	api.POST("/orders/", middlewares.Auth(handlers.CreateOrder(pool)))
-	api.DELETE("/orders/:id", middlewares.Auth(handlers.DeleteOrder(pool)))
+	auth := middlewares.Auth(cfg.secret)
+	api.GET("/orders", auth(handlers.GetOrders(pool)))
+	api.GET("/orders/:id", auth(handlers.GetOrder(pool)))
+	api.POST("/orders/", auth(handlers.CreateOrder(pool)))
+	api.DELETE("/orders/:id", auth(handlers.DeleteOrder(pool)))
 
 	return router
 }
