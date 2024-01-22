@@ -23,14 +23,26 @@ jobs:
                 -v ${{ github.workspace }}/sql:/docker-entrypoint-initdb.d
 
         steps:
+            # setup 
             - uses: actions/checkout@v3
             - uses: actions/setup-go@v4
               with:
                 go-version: '1.21'
                 cache: false
+
+            # lint
             - name: golangci-lint
               uses: golangci/golangci-lint-action@v3
               with:
                 version: v1.54
+
+            # test
+            - name: Setup PostgreSQL client
+              run: sudo apt-get -yqq install postgresql-client
+            - name: Run SQL scripts
+              run: |
+                for sql_file in $(ls sql/*.sql | sort); do
+                    psql postgresql://postgres:postgres@localhost:5432/postgres -f $sql_file
+                done
             - name: Run test
               run: go test -v ./...

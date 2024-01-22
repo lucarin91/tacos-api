@@ -37,4 +37,4 @@ tasks:
   db:connect:
     desc: Connect to local database
     cmds:
-      - psql -h localhost -U postgres -d postgres
+      - psql postgresql://postgres:postgres@localhost:5432/postgres
