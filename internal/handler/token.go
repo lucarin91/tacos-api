@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 
-	"github.com/lucarin91/tacos-api/models"
+	"github.com/lucarin91/tacos-api/internal/model"
 )
 
 type TokenClaims struct {
@@ -41,13 +41,13 @@ func GetToken(secret []byte) httptreemux.HandlerFunc {
 
 		tokenStr, err := token.SignedString(secret)
 		if err != nil {
-			models.WriteInternalError(w, err)
+			model.WriteInternalError(w, err)
 			return
 		}
 
-		err = json.NewEncoder(w).Encode(models.Token{Token: tokenStr})
+		err = json.NewEncoder(w).Encode(model.Token{Token: tokenStr})
 		if err != nil {
-			models.WriteInternalError(w, err)
+			model.WriteInternalError(w, err)
 			return
 		}
 	}

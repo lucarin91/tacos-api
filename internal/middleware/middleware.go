@@ -1,4 +1,4 @@
-package middlewares
+package middleware
 
 import (
 	"log/slog"
@@ -7,15 +7,15 @@ import (
 	"github.com/dimfeld/httptreemux/v5"
 	"github.com/golang-jwt/jwt/v5"
 
-	"github.com/lucarin91/tacos-api/handlers"
+	"github.com/lucarin91/tacos-api/internal/handler"
 )
 
-func Auth(secret []byte) func(next handlers.UserIdHandler) httptreemux.HandlerFunc {
-	return func(next handlers.UserIdHandler) httptreemux.HandlerFunc {
+func Auth(secret []byte) func(next handler.UserIdHandler) httptreemux.HandlerFunc {
+	return func(next handler.UserIdHandler) httptreemux.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request, params map[string]string) {
 			tokenStr := r.Header.Get("Authorization")
 
-			token, err := jwt.ParseWithClaims(tokenStr, &handlers.TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+			token, err := jwt.ParseWithClaims(tokenStr, &handler.TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 				return secret, nil
 			})
 			if err != nil {
@@ -24,7 +24,7 @@ func Auth(secret []byte) func(next handlers.UserIdHandler) httptreemux.HandlerFu
 				return
 			}
 
-			claims, ok := token.Claims.(*handlers.TokenClaims)
+			claims, ok := token.Claims.(*handler.TokenClaims)
 			if !token.Valid || !ok {
 				w.WriteHeader(http.StatusUnauthorized)
 				return

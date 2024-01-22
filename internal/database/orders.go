@@ -6,10 +6,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/lucarin91/tacos-api/models"
+	"github.com/lucarin91/tacos-api/internal/model"
 )
 
-func GetOrders(ctx context.Context, pool *pgxpool.Pool, userID uuid.UUID) ([]models.Order, error) {
+func GetOrders(ctx context.Context, pool *pgxpool.Pool, userID uuid.UUID) ([]model.Order, error) {
 	rows, err := pool.Query(ctx, `
 		select orders.id, ingredients.id, ingredients.name, ingredients.category
 		from orders
@@ -21,10 +21,10 @@ func GetOrders(ctx context.Context, pool *pgxpool.Pool, userID uuid.UUID) ([]mod
 		return nil, err
 	}
 
-	ordersMap := make(map[uuid.UUID]models.Order)
+	ordersMap := make(map[uuid.UUID]model.Order)
 	for rows.Next() {
 		var orderID uuid.UUID
-		var ingredient models.Ingredient
+		var ingredient model.Ingredient
 		err := rows.Scan(&orderID, &ingredient.ID, &ingredient.Name, &ingredient.Category)
 		if err != nil {
 			return nil, err
@@ -32,7 +32,7 @@ func GetOrders(ctx context.Context, pool *pgxpool.Pool, userID uuid.UUID) ([]mod
 
 		order, ok := ordersMap[orderID]
 		if !ok {
-			order = models.Order{
+			order = model.Order{
 				ID: orderID,
 			}
 		}
@@ -40,7 +40,7 @@ func GetOrders(ctx context.Context, pool *pgxpool.Pool, userID uuid.UUID) ([]mod
 		ordersMap[orderID] = order
 	}
 
-	orders := make([]models.Order, 0, len(ordersMap))
+	orders := make([]model.Order, 0, len(ordersMap))
 	for _, order := range ordersMap {
 		orders = append(orders, order)
 	}
@@ -48,7 +48,7 @@ func GetOrders(ctx context.Context, pool *pgxpool.Pool, userID uuid.UUID) ([]mod
 	return orders, nil
 }
 
-func GetOrder(ctx context.Context, pool *pgxpool.Pool, userID, id uuid.UUID) (*models.Order, error) {
+func GetOrder(ctx context.Context, pool *pgxpool.Pool, userID, id uuid.UUID) (*model.Order, error) {
 	rows, err := pool.Query(ctx, `
 		select ingredients.id, ingredients.name, ingredients.category
 		from orders
@@ -64,9 +64,9 @@ func GetOrder(ctx context.Context, pool *pgxpool.Pool, userID, id uuid.UUID) (*m
 		return nil, nil
 	}
 
-	order := &models.Order{ID: id}
+	order := &model.Order{ID: id}
 	for rows.Next() {
-		var ingredient models.Ingredient
+		var ingredient model.Ingredient
 		err := rows.Scan(&ingredient.ID, &ingredient.Name, &ingredient.Category)
 		if err != nil {
 			return nil, err
@@ -78,7 +78,7 @@ func GetOrder(ctx context.Context, pool *pgxpool.Pool, userID, id uuid.UUID) (*m
 	return order, nil
 }
 
-func CreateOrder(ctx context.Context, pool *pgxpool.Pool, userID uuid.UUID, order models.Order) error {
+func CreateOrder(ctx context.Context, pool *pgxpool.Pool, userID uuid.UUID, order model.Order) error {
 	tx, err := pool.Begin(ctx)
 	if err != nil {
 		return err

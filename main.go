@@ -12,8 +12,8 @@ import (
 	"github.com/dimfeld/httptreemux/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/lucarin91/tacos-api/handlers"
-	"github.com/lucarin91/tacos-api/middlewares"
+	"github.com/lucarin91/tacos-api/internal/handler"
+	"github.com/lucarin91/tacos-api/internal/middleware"
 )
 
 type Config struct {
@@ -70,19 +70,19 @@ func main() {
 }
 
 func AddHandlers(router *httptreemux.TreeMux, pool *pgxpool.Pool) *httptreemux.TreeMux {
-	router.Use(middlewares.Log)
+	router.Use(middleware.Log)
 
 	api := router.NewGroup("/v1")
 
-	api.GET("/token", handlers.GetToken(cfg.secret))
+	api.GET("/token", handler.GetToken(cfg.secret))
 
-	api.GET("/ingredients", handlers.GetIngredients(pool))
+	api.GET("/ingredients", handler.GetIngredients(pool))
 
-	auth := middlewares.Auth(cfg.secret)
-	api.GET("/orders", auth(handlers.GetOrders(pool)))
-	api.GET("/orders/:id", auth(handlers.GetOrder(pool)))
-	api.POST("/orders/", auth(handlers.CreateOrder(pool)))
-	api.DELETE("/orders/:id", auth(handlers.DeleteOrder(pool)))
+	auth := middleware.Auth(cfg.secret)
+	api.GET("/orders", auth(handler.GetOrders(pool)))
+	api.GET("/orders/:id", auth(handler.GetOrder(pool)))
+	api.POST("/orders/", auth(handler.CreateOrder(pool)))
+	api.DELETE("/orders/:id", auth(handler.DeleteOrder(pool)))
 
 	return router
 }

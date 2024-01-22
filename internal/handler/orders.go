@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import (
 	"encoding/json"
@@ -8,8 +8,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/lucarin91/tacos-api/database"
-	"github.com/lucarin91/tacos-api/models"
+	"github.com/lucarin91/tacos-api/internal/database"
+	"github.com/lucarin91/tacos-api/internal/model"
 )
 
 type UserIdHandler func(w http.ResponseWriter, r *http.Request, params map[string]string, userID uuid.UUID)
@@ -18,13 +18,13 @@ func GetOrders(pool *pgxpool.Pool) UserIdHandler {
 	return func(w http.ResponseWriter, r *http.Request, params map[string]string, userID uuid.UUID) {
 		orders, err := database.GetOrders(r.Context(), pool, userID)
 		if err != nil {
-			models.WriteInternalError(w, err)
+			model.WriteInternalError(w, err)
 			return
 		}
 
 		err = json.NewEncoder(w).Encode(orders)
 		if err != nil {
-			models.WriteInternalError(w, err)
+			model.WriteInternalError(w, err)
 			return
 		}
 	}
@@ -34,13 +34,13 @@ func GetOrder(pool *pgxpool.Pool) UserIdHandler {
 	return func(w http.ResponseWriter, r *http.Request, params map[string]string, userID uuid.UUID) {
 		id, err := uuid.Parse(params["id"])
 		if err != nil {
-			models.WriteClientError(w, err)
+			model.WriteClientError(w, err)
 			return
 		}
 
 		order, err := database.GetOrder(r.Context(), pool, userID, id)
 		if err != nil {
-			models.WriteClientError(w, err)
+			model.WriteClientError(w, err)
 		}
 
 		if order == nil {
@@ -50,13 +50,13 @@ func GetOrder(pool *pgxpool.Pool) UserIdHandler {
 
 		err = json.NewEncoder(w).Encode(order)
 		if err != nil {
-			models.WriteInternalError(w, err)
+			model.WriteInternalError(w, err)
 			return
 		}
 	}
 }
 
-func validateIngredients(ingredients []models.Ingredient) error {
+func validateIngredients(ingredients []model.Ingredient) error {
 	protein, bread := false, false
 
 	for _, ingredient := range ingredients {
@@ -85,28 +85,28 @@ func validateIngredients(ingredients []models.Ingredient) error {
 func CreateOrder(pool *pgxpool.Pool) UserIdHandler {
 	return func(w http.ResponseWriter, r *http.Request, params map[string]string, userID uuid.UUID) {
 		var in struct {
-			Ingredients []models.Ingredient `json:"ingredients"`
+			Ingredients []model.Ingredient `json:"ingredients"`
 		}
 		err := json.NewDecoder(r.Body).Decode(&in)
 		if err != nil {
-			models.WriteClientError(w, err)
+			model.WriteClientError(w, err)
 			return
 		}
 
 		err = validateIngredients(in.Ingredients)
 		if err != nil {
-			models.WriteClientError(w, err)
+			model.WriteClientError(w, err)
 			return
 		}
 
-		order := models.Order{
+		order := model.Order{
 			ID:          uuid.New(),
 			Ingredients: in.Ingredients,
 		}
 
 		err = database.CreateOrder(r.Context(), pool, userID, order)
 		if err != nil {
-			models.WriteInternalError(w, err)
+			model.WriteInternalError(w, err)
 			return
 		}
 
@@ -118,13 +118,13 @@ func DeleteOrder(pool *pgxpool.Pool) UserIdHandler {
 	return func(w http.ResponseWriter, r *http.Request, params map[string]string, userID uuid.UUID) {
 		id, err := uuid.Parse(params["id"])
 		if err != nil {
-			models.WriteClientError(w, err)
+			model.WriteClientError(w, err)
 			return
 		}
 
 		err = database.DeleteOrder(r.Context(), pool, userID, id)
 		if err != nil {
-			models.WriteInternalError(w, err)
+			model.WriteInternalError(w, err)
 			return
 		}
 
