@@ -1,0 +1,48 @@
+name: Go
+
+on:
+    push:
+        branches: [ main ]
+    pull_request:
+        branches: [ main ]
+
+jobs:
+    tests:
+        name: run lint and tests
+        runs-on: ubuntu-latest
+
+        services:
+            postgres:
+              image: postgres:13.3
+              env:
+                POSTGRES_PASSWORD: postgres
+              ports:
+                - 5432:5432
+              options: >
+                --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+                -v ${{ github.workspace }}/sql:/docker-entrypoint-initdb.d
+
+        steps:
+            # setup 
+            - uses: actions/checkout@v3
+            - uses: actions/setup-go@v4
+              with:
+                go-version: '1.21'
+                cache: false
+
+            # lint
+            - name: golangci-lint
+              uses: golangci/golangci-lint-action@v3
+              with:
+                version: v1.54
+
+            # test
+            - name: Setup PostgreSQL client
+              run: sudo apt-get -yqq install postgresql-client
+            - name: Run SQL scripts
+              run: |
+                for sql_file in $(ls sql/*.sql | sort); do
+                    psql postgresql://postgres:postgres@localhost:5432/postgres -f $sql_file
+                done
+            - name: Run test
+              run: go test -v ./...
